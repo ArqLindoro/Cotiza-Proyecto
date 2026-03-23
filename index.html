@@ -41,4 +41,104 @@
     </div>
 
     <div class="input-group">
-        <label>Metros Cu
+        <label>Metros Cuadrados de Construcción (m²):</label>
+        <input type="number" id="m2" value="100" oninput="sumar()">
+    </div>
+
+    <div id="check-list">
+        <label>Seleccione los entregables requeridos:</label>
+        
+        <div class="item">
+            <input type="checkbox" class="cost-m2" value="200" checked onchange="sumar()">
+            <div class="info"><b>Proyecto Arquitectónico</b><small>Plantas, cortes y fachadas</small></div>
+            <div class="price-tag">$200/m²</div>
+        </div>
+
+        <div class="item">
+            <input type="checkbox" class="cost-m2" value="150" onchange="sumar()">
+            <div class="info"><b>Cálculo Estructural</b><small>Memoria y planos de armado</small></div>
+            <div class="price-tag">$150/m²</div>
+        </div>
+
+        <div class="item">
+            <input type="checkbox" class="cost-m2" value="100" onchange="sumar()">
+            <div class="info"><b>Instalaciones</b><small>Hidro-sanitaria y Eléctrica</small></div>
+            <div class="price-tag">$100/m²</div>
+        </div>
+
+        <div class="item">
+            <input type="checkbox" class="cost-fixed" value="15000" onchange="sumar()">
+            <div class="info"><b>Renders Pro</b><small>5 vistas fotorrealistas</small></div>
+            <div class="price-tag">$15,000</div>
+        </div>
+    </div>
+
+    <div class="total-section">
+        <span>Inversión Total Estimada:</span>
+        <span id="total-price">$0.00 MXN</span>
+        <small id="breakdown">Módulos seleccionados</small>
+    </div>
+
+    <div class="btn-group">
+        <button class="btn btn-calc" onclick="sumar()">RECALCULAR TOTAL</button>
+        <button class="btn btn-pdf" onclick="descargarPDF()">DESCARGAR PDF</button>
+        <button class="btn btn-wa" onclick="enviarWA()">ENVIAR A WHATSAPP</button>
+    </div>
+</div>
+
+<script>
+    function sumar() {
+        const m2 = parseFloat(document.getElementById('m2').value) || 0;
+        let costoPorM2 = 0;
+        let costoFijo = 0;
+
+        document.querySelectorAll('.cost-m2:checked').forEach(c => costoPorM2 += parseFloat(c.value));
+        document.querySelectorAll('.cost-fixed:checked').forEach(c => costoFijo += parseFloat(c.value));
+
+        const total = (m2 * costoPorM2) + costoFijo;
+        
+        document.getElementById('total-price').innerText = new Intl.NumberFormat('es-MX', {
+            style: 'currency', currency: 'MXN'
+        }).format(total) + " MXN";
+        
+        document.getElementById('breakdown').innerText = `${m2}m² x $${costoPorM2}/m² + $${costoFijo.toLocaleString()} fijos`;
+    }
+
+    async function descargarPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        const m2 = document.getElementById('m2').value;
+        const total = document.getElementById('total-price').innerText;
+        
+        doc.setFontSize(18);
+        doc.text("COTIZACIÓN: PROYECTO EJECUTIVO", 20, 20);
+        doc.setFontSize(12);
+        doc.text("Arquitecto: David Lindoro Juárez", 20, 30);
+        doc.text("Ubicación: Puebla, Pue.", 20, 37);
+        doc.line(20, 42, 190, 42);
+        
+        doc.text("Resumen:", 20, 52);
+        doc.text("- Metros cuadrados: " + m2 + " m2", 25, 60);
+        doc.text("- Total estimado: " + total, 25, 68);
+        
+        doc.setFontSize(10);
+        doc.text("Este documento es una estimación paramétrica.", 20, 90);
+        
+        doc.save("Cotizacion_Arq_Lindoro.pdf");
+    }
+
+    function enviarWA() {
+        const m2 = document.getElementById('m2').value;
+        const total = document.getElementById('total-price').innerText;
+        const mensaje = `Hola Arq. David Lindoro, realicé una cotización para un proyecto de ${m2}m² con un total de ${total}. Me interesa agendar una cita técnica.`;
+        const url = `https://wa.me/522220000000?text=${encodeURIComponent(mensaje)}`; // CAMBIA EL NÚMERO AQUÍ
+        window.open(url, '_blank');
+    }
+
+    // Inicializar suma
+    window.onload = sumar;
+</script>
+
+</body>
+</html>
