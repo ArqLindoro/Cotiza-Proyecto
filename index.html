@@ -3,102 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cotizador Profesional - Arq. David Lindoro</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <title>Cotizador Arq. David Lindoro</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
     <style>
-        :root { --gold: #d4af37; --dark: #1a1a1a; --gray: #f4f4f9; }
-        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: var(--gray); padding: 20px; }
-        .card { max-width: 700px; background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin: auto; }
-        .header { text-align: center; border-bottom: 2px solid var(--gold); padding-bottom: 20px; margin-bottom: 30px; }
-        h1 { margin: 0; font-weight: 300; letter-spacing: 2px; }
-        .section-title { font-weight: bold; margin: 20px 0 10px; color: var(--dark); display: block; border-left: 4px solid var(--gold); padding-left: 10px; }
-        .input-m2 { width: 100%; padding: 15px; font-size: 18px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 20px; }
-        
-        .option { display: flex; align-items: center; background: #fff; border: 1px solid #eee; padding: 15px; margin-bottom: 10px; border-radius: 8px; cursor: pointer; transition: 0.2s; }
-        .option:hover { border-color: var(--gold); }
-        .option input { margin-right: 15px; transform: scale(1.3); cursor: pointer; }
-        .option-text { flex-grow: 1; }
-        .option-price { font-weight: bold; color: var(--gold); }
-
-        .result-area { background: var(--dark); color: white; padding: 25px; border-radius: 10px; margin-top: 30px; text-align: center; }
-        .total-amount { display: block; font-size: 36px; color: var(--gold); font-weight: bold; margin: 10px 0; }
-        
-        .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        .btn { padding: 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; text-decoration: none; text-align: center; transition: 0.3s; }
-        .btn-pdf { background: #e74c3c; color: white; }
-        .btn-wa { background: #27ae60; color: white; }
-        .btn:hover { opacity: 0.8; }
-
-        /* Estilo para el PDF oculto */
-        #pdf-content { display: none; padding: 40px; }
+        :root { --gold: #b8962d; --black: #1a1a1a; --white: #ffffff; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f0f0; padding: 20px; }
+        .container { max-width: 650px; background: var(--white); margin: auto; padding: 30px; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.2); }
+        .header { text-align: center; border-bottom: 2px solid var(--gold); margin-bottom: 20px; padding-bottom: 10px; }
+        h1 { margin: 0; color: var(--black); font-size: 22px; text-transform: uppercase; }
+        .input-group { margin-bottom: 20px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        input[type="number"] { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
+        .item { display: flex; align-items: center; justify-content: space-between; padding: 12px; border-bottom: 1px solid #eee; }
+        .item:hover { background: #f9f9f9; }
+        .info { flex: 1; margin-left: 10px; }
+        .info b { display: block; font-size: 15px; }
+        .info small { color: #777; }
+        .price-tag { color: var(--gold); font-weight: bold; min-width: 80px; text-align: right; }
+        .total-section { background: var(--black); color: white; padding: 20px; border-radius: 10px; margin-top: 25px; text-align: center; }
+        #total-price { font-size: 32px; color: var(--gold); display: block; font-weight: bold; }
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .btn { padding: 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; text-decoration: none; text-align: center; font-size: 14px; }
+        .btn-calc { background: var(--gold); color: white; grid-column: span 2; margin-bottom: 5px; }
+        .btn-pdf { background: #d9534f; color: white; }
+        .btn-wa { background: #25d366; color: white; }
+        .btn:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
 
-<div class="card" id="main-card">
+<div class="container" id="content">
     <div class="header">
-        <h1>ARQ. DAVID LINDORO</h1>
-        <p>Arquitectura de Autor | Puebla, MX</p>
+        <h1>Arq. David Lindoro Juárez</h1>
+        <p>Servicios de Arquitectura de Autor - Puebla</p>
     </div>
 
-    <label class="section-title">1. Dimensiones del Proyecto</label>
-    <input type="number" id="input-m2" class="input-m2" placeholder="Ingrese m² de construcción (ej. 200)" oninput="updateAll()">
-
-    <label class="section-title">2. Alcance del Proyecto Ejecutivo</label>
-    
-    <div id="options-container">
-        <label class="option">
-            <input type="checkbox" class="chk-m2" value="200" onchange="updateAll()" checked>
-            <div class="option-text">Planos Arquitectónicos Detallados<br><small>Distribución, fachadas y cortes técnicos</small></div>
-            <div class="option-price">$200/m²</div>
-        </label>
-
-        <label class="option">
-            <input type="checkbox" class="chk-m2" value="150" onchange="updateAll()">
-            <div class="option-text">Ingeniería Estructural<br><small>Memoria de cálculo y planos de armado</small></div>
-            <div class="option-price">$150/m²</div>
-        </label>
-
-        <label class="option">
-            <input type="checkbox" class="chk-m2" value="120" onchange="updateAll()">
-            <div class="option-text">Instalaciones Integrales<br><small>Hidro-sanitaria, eléctrica y gas</small></div>
-            <div class="option-price">$120/m²</div>
-        </label>
-
-        <label class="option">
-            <input type="checkbox" class="chk-m2" value="80" onchange="updateAll()">
-            <div class="option-text">Catálogo de Conceptos y Presupuesto<br><small>Documentación para licitación de obra</small></div>
-            <div class="option-price">$80/m²</div>
-        </label>
-
-        <label class="section-title">3. Servicios Premium (Costo Fijo)</label>
-
-        <label class="option">
-            <input type="checkbox" class="chk-fixed" value="12000" onchange="updateAll()">
-            <div class="option-text">Visualización 3D Pro (Renders)<br><small>5 vistas fotorrealistas de alta gama</small></div>
-            <div class="option-price">$12,000</div>
-        </label>
-
-        <label class="option">
-            <input type="checkbox" class="chk-fixed" value="7500" onchange="updateAll()">
-            <div class="option-text">Estudio de Neuroarquitectura<br><small>Optimización de bienestar y salud</small></div>
-            <div class="option-price">$7,500</div>
-        </label>
-    </div>
-
-    <div class="result-area">
-        <span>Inversión Estimada:</span>
-        <span class="total-amount" id="display-total">$0.00</span>
-        <small id="display-breakdown">Seleccione opciones para calcular</small>
-    </div>
-
-    <div class="actions">
-        <button class="btn btn-pdf" onclick="generatePDF()">Descargar PDF</button>
-        <a id="btn-wa" href="#" target="_blank" class="btn btn-wa">Enviar por WhatsApp</a>
-    </div>
-</div>
-
-<div id="pdf-template" style="display:none; font-family: Arial, sans-serif; color: #333;">
-    <h1 style="color:#d4af37; border-bottom: 1px solid #d4af37;">COTIZACIÓN DE PROYECTO EJECUTIVO</h1>
-    <p><strong>Arquitecto:</strong> David Lindoro Juárez</p>
-    <p><strong>Ubicación:</strong> Puebla, Puebla.</
+    <div class="input-group">
+        <label>Metros Cu
