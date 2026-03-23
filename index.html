@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cotizador de Proyecto Ejecutivo - Arq. David Lindoro</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f9; color: #333; padding: 20px; }
+        .container { max-width: 600px; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); margin: auto; }
+        h1 { color: #1a1a1a; font-size: 24px; text-align: center; margin-bottom: 10px; }
+        p.subtitle { text-align: center; color: #666; margin-bottom: 30px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: bold; margin-bottom: 8px; }
+        input[type="number"] { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        .module-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; border-bottom: 1px solid #eee; transition: 0.3s; }
+        .module-item:hover { background-color: #f9f9f9; }
+        .module-info { flex-grow: 1; margin-left: 10px; }
+        .module-info span { display: block; font-size: 14px; font-weight: bold; }
+        .module-info small { color: #888; font-size: 12px; }
+        .total-box { margin-top: 30px; padding: 20px; background: #1a1a1a; color: white; border-radius: 8px; text-align: center; }
+        .total-box h2 { margin: 0; font-size: 28px; color: #d4af37; } /* Color Dorado para Lujo */
+        .btn-contact { display: block; width: 100%; padding: 15px; background: #d4af37; color: white; text-align: center; text-decoration: none; border-radius: 6px; margin-top: 20px; font-weight: bold; transition: 0.3s; }
+        .btn-contact:hover { background: #b8962d; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Cotizador de Proyecto Ejecutivo</h1>
+    <p class="subtitle">Diseñe el alcance de su proyecto de autor en Puebla.</p>
+
+    <div class="form-group">
+        <label for="m2">Metros Cuadrados de Construcción (m²)</label>
+        <input type="number" id="m2" placeholder="Ej. 250" oninput="calcular()">
+    </div>
+
+    <div id="modulos">
+        <label>Seleccione los servicios requeridos:</label>
+        
+        <div class="module-item">
+            <input type="checkbox" class="cost-m2" value="150" onchange="calcular()">
+            <div class="module-info">
+                <span>Diseño Arquitectónico</span>
+                <small>Planos, fachadas y concepto espacial.</small>
+            </div>
+        </div>
+
+        <div class="module-item">
+            <input type="checkbox" class="cost-m2" value="120" onchange="calcular()">
+            <div class="module-info">
+                <span>Ingeniería Estructural</span>
+                <small>Cálculo sísmico y planos de armado.</small>
+            </div>
+        </div>
+
+        <div class="module-item">
+            <input type="checkbox" class="cost-m2" value="80" onchange="calcular()">
+            <div class="module-info">
+                <span>Instalaciones Hidro-Eléctricas</span>
+                <small>Planos hidráulicos, sanitarios, gas y electricidad.</small>
+            </div>
+        </div>
+
+        <div class="module-item">
+            <input type="checkbox" class="cost-m2" value="100" onchange="calcular()">
+            <div class="module-info">
+                <span>Interiores y Carpinterías</span>
+                <small>Diseño detallado de muebles fijos y acabados.</small>
+            </div>
+        </div>
+
+        <div class="module-item">
+            <input type="checkbox" class="cost-m2" value="50" onchange="calcular()">
+            <div class="module-info">
+                <span>Documentación de Obra</span>
+                <small>Catálogo de conceptos y presupuesto base.</small>
+            </div>
+        </div>
+
+        <label style="margin-top: 20px;">Servicios Adicionales (Costos Fijos):</label>
+        
+        <div class="module-item">
+            <input type="checkbox" class="cost-fijo" value="15000" onchange="calcular()">
+            <div class="module-info">
+                <span>Paquete de Renders (D5 Render)</span>
+                <small>5 imágenes fotorrealistas de alta calidad.</small>
+            </div>
+        </div>
+
+        <div class="module-item">
+            <input type="checkbox" class="cost-fijo" value="8000" onchange="calcular()">
+            <div class="module-info">
+                <span>Consultoría en Neuroarquitectura</span>
+                <small>Optimización de espacios para el bienestar.</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="total-box">
+        <span>Inversión Total Estimada:</span>
+        <h2 id="total">$0.00</h2>
+        <small id="costo-por-m2">Costo unitario: $0/m²</small>
+    </div>
+
+    <a href="#" class="btn-contact" id="whatsapp-link">Solicitar Propuesta Formal</a>
+</div>
+
+<script>
+    function calcular() {
+        const m2 = parseFloat(document.getElementById('m2').value) || 0;
+        let sumaM2 = 0;
+        let sumaFijos = 0;
+
+        // Sumar checks por m2
+        document.querySelectorAll('.cost-m2:checked').forEach(item => {
+            sumaM2 += parseFloat(item.value);
+        });
+
+        // Sumar checks fijos
+        document.querySelectorAll('.cost-fijo:checked').forEach(item => {
+            sumaFijos += parseFloat(item.value);
+        });
+
+        const total = (m2 * sumaM2) + sumaFijos;
+
+        // Mostrar resultados
+        document.getElementById('total').innerText = '$' + total.toLocaleString('es-MX', {minimumFractionDigits: 2});
+        document.getElementById('costo-por-m2').innerText = 'Costo unitario: $' + sumaM2 + '/m²';
+
+        // Actualizar link de WhatsApp con el resumen
+        const mensaje = `Hola Arq. David Lindoro, realicé una cotización para un proyecto de ${
